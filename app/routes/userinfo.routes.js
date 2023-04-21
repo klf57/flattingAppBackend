@@ -6,7 +6,7 @@
  *
  */
 
-const user = require('../controllers/user.server.controller');
+const user = require('../controllers/user.controller');
 
 
 /**

@@ -6,7 +6,7 @@
  */
 
 
-const user = require('../models/user.server.model');
+const user = require('../models/userinfo.model');
 const bcrypt = require('bcrypt');
 
 
