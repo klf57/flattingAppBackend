@@ -1,0 +1,11 @@
+#ignore any folders marked out
+out/
+
+#ignore files with .iml exten
+*.iml
+
+#ignore .idea folders
+.idea/
+.env
+index.js
+node_modules/

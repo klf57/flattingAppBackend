@@ -1,0 +1,22 @@
+{
+  "name": "flattingApp",
+  "description": "An app for flatmates to interact",
+  "homepage": "http://my.project.website",
+  "keywords": [
+    "flat",
+    "application",
+    "api"
+  ],
+  "author": "my name <fulgenciokennleen@Gmail.com",
+  "main": "app.js",
+  "version": "1.0.0",
+  "dependencies": {
+    "bcrypt": "^5.1.0",
+    "body-parser": "^1.19.0",
+    "dotenv": "^8.2.0",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.0",
+    "mysql2": "^2.1.0",
+    "rand-token": "^1.0.1"
+  }
+}
