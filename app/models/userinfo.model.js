@@ -1,5 +1,4 @@
 
-const tokenHandler = require(`rand-token`);
 /**
  * Imports the db config file and has these functions
  *in the model, queries for db go here.
@@ -62,15 +61,15 @@ exports.getHashedPassword =  async function (email) {
  * @param userId
  * @returns {Promise<void>}
  */
-exports.startNewSession = async function(userId) {
+exports.startNewSession = async function(userId, sessionToken) {
 
     console.log(`Request to start new session`);
 
-    let newToken = tokenHandler.generate(30);
+
 
     const conn = await db.getPool().getConnection();
     const query = 'UPDATE  `user` SET `session_token` = ? WHERE `iduser` = ?';
-    const [result] = await conn.query(query, [newToken, userId]);
+    const [result] = await conn.query(query, [sessionToken, userId]);
     conn.release();
 
     //does not need a result from db. Just return the new Token and the provided ID.

@@ -6,6 +6,8 @@
  */
 
 
+const tokenHandler = require(`rand-token`);
+const jwt = require(`jsonwebtoken`);
 const user = require('../models/userinfo.model');
 const bcrypt = require('bcrypt');
 
@@ -48,7 +50,7 @@ exports.create = async function(req, res){
 
         const result = await user.createNewUser(firstName, lastName, email, hashedPassword);
         res.status(201)
-            .send(result); //{user_id: result.insertId}
+            .send(result); //{user_id: result.insertId} todo Do I  need the new userId ? don't think so. Decide to remove or not.
 
         //the user_id returned to the client to use in further requests
     } catch ( err ) {
@@ -58,7 +60,12 @@ exports.create = async function(req, res){
     }
 }
 
-
+/**
+ * Handles logging the user into the system.
+ * @param req
+ * @param res
+ * @returns {Promise<void>}
+ */
 exports.login = async function(req, res) {
 
     //when is token generated? could be in the model
@@ -74,14 +81,15 @@ exports.login = async function(req, res) {
         //compare the passwords
         if(bcrypt.compare(password, userDetails['password'])){
 
-            //CREATE a session token.
-            const userSession = await user.startNewSession(userDetails['iduser']);
 
-            //just do await user.startNewSession();
-            //Have token generated here.
-            // use .json([iduser, token]
+
+            const sessionToken = jwt.sign({"iduser" : iduser}, process.env.TOKENSIGN);
+
+            //Store session token.
+            await user.startNewSession(userDetails['iduser'], sessionToken);
+
             res.status(200)
-                .json(userSession);
+                .json(sessionToken);
 
         } else {
             res.statusMessage = "password or email does not match";
@@ -115,9 +123,7 @@ exports.viewBills = async function(req, res) {
 exports.read = async function(req, res){
     return null;
 };
-exports.update = async function(req, res){
-    return null;
-};
+
 exports.delete = async function(req, res){
     return null;
 };

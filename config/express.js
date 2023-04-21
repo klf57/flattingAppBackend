@@ -3,7 +3,7 @@
  * boilerplate code learnt from UC course.
  *
  */
-
+const firebase = require('./config/firebase');
 const express = require( 'express'),
     bodyParser = require( 'body-parser');
 
@@ -11,6 +11,7 @@ module.exports = function() {
 
     const app = express();
     app.use( bodyParser.json() );
+    app.use(firebase);
 
     //to allow for cors. cross origin
     /*

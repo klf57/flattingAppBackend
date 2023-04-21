@@ -1,6 +1,7 @@
 /**imports db and express code
  * type node app.js to make connection with db.
  * **/
+
 const db = require('./config/db'),
     express = require('./config/express');
 
