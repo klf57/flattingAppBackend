@@ -5,9 +5,11 @@
  *
  */
 
+const jwt = require(`jsonwebtoken`);
 
 const user = require('../models/userinfo.model');
 const bcrypt = require('bcrypt');
+const Process = require("process");
 
 
 const saltRounds = 10;
@@ -46,9 +48,9 @@ exports.create = async function(req, res){
 
     try {
 
-        const result = await user.createNewUser(firstName, lastName, email, hashedPassword);
+        await user.createNewUser(firstName, lastName, email, hashedPassword);
         res.status(201)
-            .send(result); //{user_id: result.insertId}
+            .send("USER CREATED"); //{user_id: result.insertId}
 
         //the user_id returned to the client to use in further requests
     } catch ( err ) {
@@ -59,7 +61,11 @@ exports.create = async function(req, res){
 }
 
 
+
+
 exports.login = async function(req, res) {
+
+    console.log('request to login');
 
     //when is token generated? could be in the model
     //user logs in with their email.
@@ -70,18 +76,21 @@ exports.login = async function(req, res) {
 
 
         const userDetails = await user.getHashedPassword(email);
-        console.log(userDetails);
+
         //compare the passwords
         if(bcrypt.compare(password, userDetails['password'])){
 
-            //CREATE a session token.
-            const userSession = await user.startNewSession(userDetails['iduser']);
+
+            const sessionToken = jwt.sign(userDetails['iduser'], Process.env.TOKENSIGN );
+
+            await user.loginUser(userDetails['iduser'],sessionToken);
+
 
             //just do await user.startNewSession();
             //Have token generated here.
             // use .json([iduser, token]
             res.status(200)
-                .json(userSession);
+                .json(sessionToken);
 
         } else {
             res.statusMessage = "password or email does not match";
@@ -96,7 +105,40 @@ exports.login = async function(req, res) {
     }
 
 
+}
 
+/**
+ * Handles model calls to updates user's status to be logged out.
+ * @param req
+ * @param res
+ * @returns {Promise<void>}
+ */
+exports.logout = async function(req, res){
+
+    console.log('request to logout');
+
+    let sessionToken = req.headers['X-Authorization'];
+    let tokenWasRemoved = await user.removeToken(sessionToken);
+
+    try{
+        //Makes sure that the db did actually update a row.
+        if(tokenWasRemoved){
+
+            res.status(200)
+                .send();
+
+        } else{
+            console.log('the provided token was not found in db');
+            res.status(401)
+                .send();
+
+        }
+
+
+    } catch(err){
+        res.status(500)
+            .send(${err});
+    }
 }
 
 exports.viewBills = async function(req, res) {

@@ -1,5 +1,4 @@
 
-const tokenHandler = require(`rand-token`);
 /**
  * Imports the db config file and has these functions
  *in the model, queries for db go here.
@@ -48,7 +47,7 @@ exports.getHashedPassword =  async function (email) {
     console.log(`Request to retrieve a user via their email`);
 
     const conn = await db.getPool().getConnection();
-    const query = 'SELECT password, iduser FROM user WHERE email = ?';
+    const query = 'SELECT password, userid FROM user WHERE email = ?';
     const [ result ] = await conn.query( query, [email]);
     conn.release();
 
@@ -62,20 +61,37 @@ exports.getHashedPassword =  async function (email) {
  * @param userId
  * @returns {Promise<void>}
  */
-exports.startNewSession = async function(userId) {
+exports.loginUser = async function(userId, sessionToken) {
 
     console.log(`Request to start new session`);
 
-    let newToken = tokenHandler.generate(30);
+
 
     const conn = await db.getPool().getConnection();
-    const query = 'UPDATE  `user` SET `session_token` = ? WHERE `iduser` = ?';
-    const [result] = await conn.query(query, [newToken, userId]);
+    const query = 'UPDATE  `user` SET `session_token` = ? WHERE `userid` = ?';
+    await conn.query(query, [sessionToken, userId]);
     conn.release();
 
     //does not need a result from db. Just return the new Token and the provided ID.
-    return result;
+    return;
 };
+
+
+/**
+ * Removes the current sessionToken from the user's db.
+ * @param userId
+ * @param sessionToken
+ * @returns {Promise<boolean>}
+ */
+exports.removeToken = async function(sessionToken){
+    const conn = await db.getPool().getConnection();
+    const query = 'UPDATE `user` SET `session_token` = NULL WHERE `session_token` = ?';
+    const [result] = await conn.query(query, [sessionToken ]);
+
+    conn.release();
+
+    return result["affectedRows"] >= 1;
+}
 
 exports.alter = async function(){
     return null;
