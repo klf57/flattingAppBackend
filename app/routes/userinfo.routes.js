@@ -7,7 +7,7 @@
  */
 
 const user = require('../controllers/user.controller');
-
+const auth = require('../middleware/Authentication');
 
 /**
  * Routes for user related actions
@@ -24,6 +24,12 @@ module.exports = function(app) {
 
     app.route(baseUrl + '/login')
         .post(user.login);
+
+    app.route(baseUrl + '/logout')
+        .post(user.logout);
+
+    app.route(baseUrl + '/flatmates')
+        .get(auth.checkUserLoggedIn, user.viewFlatmates);
 
 
 

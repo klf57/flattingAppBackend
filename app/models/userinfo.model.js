@@ -47,7 +47,7 @@ exports.getHashedPassword =  async function (email) {
     console.log(`Request to retrieve a user via their email`);
 
     const conn = await db.getPool().getConnection();
-    const query = 'SELECT password, userid FROM user WHERE email = ?';
+    const query = 'SELECT `password`, `userid` FROM user WHERE `email` = ?';
     const [ result ] = await conn.query( query, [email]);
     conn.release();
 
@@ -86,12 +86,45 @@ exports.loginUser = async function(userId, sessionToken) {
 exports.removeToken = async function(sessionToken){
     const conn = await db.getPool().getConnection();
     const query = 'UPDATE `user` SET `session_token` = NULL WHERE `session_token` = ?';
-    const [result] = await conn.query(query, [sessionToken ]);
+    const [result] = await conn.query(query, [sessionToken]);
 
     conn.release();
 
     return result["affectedRows"] >= 1;
 }
+
+
+/**
+ * Retrieves the user id that matches the provided token
+ * @param sessionToken
+ * @returns {Promise<*>}
+ */
+exports.getUserByIdToken = async function(sessionToken){
+
+    const conn = await db.getPool().getConnection();
+    const query = 'SELECT `userid` FROM `user` WHERE `session_token = ?` ';
+    const result = await conn.query(query, [sessionToken]);
+    conn.release();
+
+
+    return result[0["userid"]];
+
+};
+
+
+exports.getFlatmatesInfo = async function(sessionToken){
+
+    const conn = await db.getPool().getConnection();
+    const query = 'SELECT `first_name`, `last_name`, `phone_number` FROM `user` ' +
+        'INNER JOIN `houses` ON `user.home` = `houses.id`' +
+        'WHERE `user.home` = (SELECT `user.home` FROM `user` AS `u1` WHERE `u1.session_token = ?)';
+    const result = await conn.query(query, [sessionToken]);
+    conn.release();
+
+    return result;
+
+}
+
 
 exports.alter = async function(){
     return null;

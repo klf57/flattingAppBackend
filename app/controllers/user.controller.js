@@ -1,3 +1,4 @@
+
 /**
  * Handles json sent from client and sends to model.
  * Followed this tutorial https://heynode.com/blog/2020-04/salt-and-hash-passwords-bcrypt/
@@ -10,6 +11,7 @@ const jwt = require(`jsonwebtoken`);
 const user = require('../models/userinfo.model');
 const bcrypt = require('bcrypt');
 const Process = require("process");
+const auth = require('../middleware/Authentication');
 
 
 const saltRounds = 10;
@@ -81,16 +83,17 @@ exports.login = async function(req, res) {
         if(bcrypt.compare(password, userDetails['password'])){
 
 
-            const sessionToken = jwt.sign(userDetails['iduser'], Process.env.TOKENSIGN );
+            //jwt.sign required 4 arguments.
+            const sessionToken = jwt.sign(userDetails['userid'], Process.env.SECRET, undefined, undefined );
 
-            await user.loginUser(userDetails['iduser'],sessionToken);
+            await user.loginUser(userDetails['userid'],sessionToken);
 
 
             //just do await user.startNewSession();
             //Have token generated here.
             // use .json([iduser, token]
             res.status(200)
-                .json(sessionToken);
+                .json({sessionToken});
 
         } else {
             res.statusMessage = "password or email does not match";
@@ -117,30 +120,59 @@ exports.logout = async function(req, res){
 
     console.log('request to logout');
 
-    let sessionToken = req.headers['X-Authorization'];
-    let tokenWasRemoved = await user.removeToken(sessionToken);
+    //x-authorization appears in all lowercase.
+    if(req.headers["x-authorization"] == null){
+        res.status(401)
+            .send();
+    } else {
 
-    try{
-        //Makes sure that the db did actually update a row.
-        if(tokenWasRemoved){
 
-            res.status(200)
-                .send();
+        let tokenWasRemoved = await user.removeToken(req.headers["x-authorization"]);
 
-        } else{
-            console.log('the provided token was not found in db');
-            res.status(401)
-                .send();
+        try {
+            //Makes sure that the db did actually update a row.
+            if (tokenWasRemoved) {
 
+                res.status(200)
+                    .send("you have been logged out.");
+
+            } else {
+                console.log('the provided token was not found in db');
+                res.status(401)
+                    .send();
+
+            }
+
+
+        } catch (err) {
+            res.status(500)
+                .send(err);
         }
-
-
-    } catch(err){
-        res.status(500)
-            .send(${err});
     }
 }
 
+/**
+ * Handles getting information of the flatemates that the current user has.
+ */
+exports.viewFlatmates = async function(req, res){
+
+    console.log("Request to retrieve flatmate's information");
+
+
+
+    try{
+        //need to check that the user is logged in first.
+        const flatMatesList = await getFlatmatesInfo(req.headers["x-authorization"]);
+
+        res.status(200)
+            .json(flatMatesList);
+
+
+    } catch(err){
+        res.status(401);
+    }
+
+}
 exports.viewBills = async function(req, res) {
 
     let userid = req.params.userId;
