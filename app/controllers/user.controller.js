@@ -11,7 +11,6 @@ const jwt = require(`jsonwebtoken`);
 const user = require('../models/userinfo.model');
 const bcrypt = require('bcrypt');
 const Process = require("process");
-const auth = require('../middleware/Authentication');
 
 
 const saltRounds = 10;
@@ -63,8 +62,12 @@ exports.create = async function(req, res){
 }
 
 
-
-
+/**
+ * Handles logging in the user to the flatting app.
+ * @param req
+ * @param res
+ * @returns {Promise<void>}
+ */
 exports.login = async function(req, res) {
 
     console.log('request to login');
@@ -96,9 +99,8 @@ exports.login = async function(req, res) {
                 .json({sessionToken});
 
         } else {
-            res.statusMessage = "password or email does not match";
             res.status(401)
-                .send();
+                .send("password or email does not match");
         }
 
 
@@ -162,7 +164,7 @@ exports.viewFlatmates = async function(req, res){
 
     try{
         //need to check that the user is logged in first.
-        const flatMatesList = await getFlatmatesInfo(req.headers["x-authorization"]);
+        const flatMatesList = await user.getFlatmatesInfo(req.headers["x-authorization"]);
 
         res.status(200)
             .json(flatMatesList);

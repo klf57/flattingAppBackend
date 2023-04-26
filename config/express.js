@@ -14,9 +14,7 @@ module.exports = function() {
     const app = express();
     app.use( bodyParser.json() );
 
-    //to allow for  cross origin resource sharing
-
-
+    //to allow for  cross origin resource sharing. using an * in Origin field means it will accept all requests.
 
     app.use(function(req, res, next) {
         res.header("Access-Control-Allow-Origin", "*");

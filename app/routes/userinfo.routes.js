@@ -23,7 +23,7 @@ module.exports = function(app) {
 
 
     app.route(baseUrl + '/login')
-        .post(user.login);
+        .post(auth.isLoginFormValid, user.login);
 
     app.route(baseUrl + '/logout')
         .post(user.logout);
@@ -33,10 +33,7 @@ module.exports = function(app) {
 
 
 
-    //Re bills for the person and the house they live in.
-    //SHOULD ALSO BE GETTING THE PERSON'S ACCOUNT ID and a token? to verify.
-    //app.route('/api/mybills/:userId')
-      //  .get(users.viewBills);
+
 }
 
 //todo show house details?
