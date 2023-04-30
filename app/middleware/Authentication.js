@@ -1,8 +1,14 @@
 /**
+ * Module needs to do white space checks for data input, especially for creating new user accounts to prevent db being filled with "empty" values.
+ **/
+const user = require('../models/userinfo.model');
+
+
+
+/**
  * Retrieves the userID after first checking if the provided token is  in db.
  * status codes : 501 = server error 401 = unauthorized.
  */
-const user = require('../models/userinfo.model');
 exports.checkUserLoggedIn= async function(req, res, next){
 
     try{
@@ -48,8 +54,8 @@ exports.checkUserLoggedIn= async function(req, res, next){
  */
 exports.isLoginFormValid = async function(req, res, next){
 
-    //checks if either email or password is empty.
-    if( !( req.body['email'] || req.body['password']) ){
+    //checks if either email or password is empty. todo: check for whitespace in given info
+    if( !( req.body['email'] || req.body['password'])  ){
 
 
         res.status(401)
@@ -69,7 +75,7 @@ exports.isLoginFormValid = async function(req, res, next){
 /**
  * Checks whether the all compulsory data is filled.
  * Req.params must have, email, names and password.
- * todo; prevent user trying to send in values that are just whitespace.
+ *
  */
 exports.isUsersFormValid =  async function(req, res, next){
 

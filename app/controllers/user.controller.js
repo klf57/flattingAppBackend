@@ -16,20 +16,6 @@ const Process = require("process");
 const saltRounds = 10;
 
 
-//Waits for and returns the result from the function model, handling any errors that arise.
-exports.list = async function(req, res){
-    console.log( '\nRequest to list users...' );
-    try {
-        const result = await user.getAll();
-        res.status( 200 )
-            .send( result );
-    } catch( err ) {
-        res.status( 500 )
-            .send( `ERROR getting users ${ err }` );
-    }
-};
-
-
 /**
  * Handles creating a new user.
  * @param req User must provide email, name, and a password.
@@ -113,7 +99,7 @@ exports.login = async function(req, res) {
 }
 
 /**
- * Handles model calls to updates user's status to be logged out.
+ * Handles commands needed to tell the db that user has logged out.
  * @param req
  * @param res
  * @returns {Promise<void>}
@@ -122,10 +108,11 @@ exports.logout = async function(req, res){
 
     console.log('request to logout');
 
-    //x-authorization appears in all lowercase.
+    //x-authorization appears in all lowercase. if statement checks if no token was given.
     if(req.headers["x-authorization"] == null){
         res.status(401)
             .send();
+
     } else {
 
 
@@ -139,9 +126,9 @@ exports.logout = async function(req, res){
                     .send("you have been logged out.");
 
             } else {
-                console.log('the provided token was not found in db');
+
                 res.status(401)
-                    .send();
+                    .send('invalid user session');
 
             }
 
@@ -154,7 +141,7 @@ exports.logout = async function(req, res){
 }
 
 /**
- * Handles getting information of the flatemates that the current user has.
+ * Handles getting information of the flatemates that the user is currently living with.
  */
 exports.viewFlatmates = async function(req, res){
 
@@ -171,7 +158,8 @@ exports.viewFlatmates = async function(req, res){
 
 
     } catch(err){
-        res.status(401);
+        res.status(401)
+            .send(err);
     }
 
 }
