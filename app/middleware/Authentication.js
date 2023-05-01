@@ -23,10 +23,10 @@ exports.checkUserLoggedIn= async function(req, res, next){
 
             const userId = await user.getUserByIdToken(sessionToken);
 
-
+            //todo test what happens if no matching token is found. Check what happens if no userId body is returned with query.
             if(userId) {
                 //add the userId to the req and move to next function in user/flatmates route.
-                //user id may be used when retrieving user's information for MENU screen
+                //user id may be  needed when retrieving user's information for MENU screen
                 req.body["userId"] = userId;
                 next();
 
@@ -45,8 +45,8 @@ exports.checkUserLoggedIn= async function(req, res, next){
 }
 
 /**
- * Check that the login information is not empty / invalid. Return 401 unauthorised if it does not pass test.
- * This is so that backend does not try to send an Undefined property to the database causing wrong status code 500 to be returned.
+ * Check that the login information is not empty / invalid. Return 401 unauthorised if it does not pass checks.
+ * This is so that backend does not try to send an Undefined property to the database causing  status code 500 to be returned.
  * @param req
  * @param res
  * @param next
@@ -65,15 +65,12 @@ exports.isLoginFormValid = async function(req, res, next){
         next();
     }
 
-
-
-
-
 };
 
 
 /**
- * Checks whether the all compulsory data is filled.
+ * todo:
+ * Checks whether  all the compulsory data is filled.
  * Req.params must have, email, names and password.
  *
  */
@@ -82,7 +79,7 @@ exports.isUsersFormValid =  async function(req, res, next){
 };
 
 /**
- * Altering data is optionable, so it also handles if a req.param call turns up undefined.
+ * Makes sure any information user wants to change is a valid change. It also handles if a req.param call turns up undefined.
  * User might only want to change one data value.
  */
 exports.isUpdateFormValid  = async function(req, res, next){

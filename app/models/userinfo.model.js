@@ -6,17 +6,6 @@
  */
 
 const db = require('../../config/db');
-exports.getAll = async function(){
-    console.log( 'Request to get all users from the database...' );
-    const conn = await db.getPool().getConnection();
-    const query = 'select * from lab2_users';
-    const [ rows ] = await conn.query( query );
-    conn.release();
-    return rows;
-};
-exports.getOne = async function(){
-    return null;
-};
 
 
 /**
@@ -90,6 +79,8 @@ exports.removeToken = async function(sessionToken){
 
     conn.release();
 
+
+    //note that the affected row should only ever be 1.
     return result["affectedRows"] >= 1;
 }
 
