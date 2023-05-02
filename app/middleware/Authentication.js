@@ -86,17 +86,14 @@ exports.isSignUpFormValid =  async function(req, res, next){
     const password =  req.body['password'];
 
 
-    //Regular expression. ^ means at start of string. \s symbol for space * for as many repeats of \s or none at all. $ is end of pattern.
-    let whiteSpaceExpression = /^\s*$/;
-
 
     //checks if any of the fields are undefined.
     if(!(firstName || lastName || email || password )){
         res.status(400)
             .send("invalid form sent. one of them is undefined");
 
-    } else if(whiteSpaceExpression.test(email) || whiteSpaceExpression.test(firstName) || whiteSpaceExpression.test(lastName) || whiteSpaceExpression.test(
-    password)) {
+
+    } else if(hasWhiteSpaces([firstName,lastName,email,password])) {
         //checks if anything is just a whitespace. OR if the length is one
 
         res.status(400)
@@ -113,10 +110,8 @@ exports.isSignUpFormValid =  async function(req, res, next){
                 .send("password length too short");
         } else{
 
-        res.status(200)
-            .send("nothing wrong found");
-
-        //next(); //moves to next function called on the route.
+        //needs to trim any trailing whitespace from email.
+        next(); //moves to next function called on the route.
 
     }
 
@@ -133,6 +128,10 @@ exports.isSignUpFormValid =  async function(req, res, next){
 exports.isUpdateFormValid  = async function(req, res, next){
 
 };
+
+
+
+
 
 /**
  * Checks if the given email is in the correct Format. THe regular expression isn't 100% accurate but should be able to detect common formats used for valid emails
@@ -153,16 +152,25 @@ function isEmailValid(email){
 
 
 /**
- *
+ *Helper function to check if a variable was only inputted with whitespaces.
  * @param valuesToCheck
  * @returns {boolean} true if it is only just white spaces. otherwise false.
  */
 function hasWhiteSpaces(valuesToCheck){
 
+    //Regular expression. ^ means at start of string. \s symbol for space * for as many repeats of \s or none at all. $ is end of pattern.
+    let whiteSpaceExpression = /^\s*$/;
+
     for(let i = 0; i < valuesToCheck.length; i++){
-        return false;
+
+
+        if( whiteSpaceExpression.test(valuesToCheck.at(i) )){
+
+            return true;
+        }
+
     }
 
-    return true;
+    return false;
 
 }
