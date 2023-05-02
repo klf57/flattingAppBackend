@@ -1,6 +1,6 @@
 /**
  * Contains all the details for configuring express.
- * boilerplate code learnt from UC tutorial.
+ * boilerplate code learnt from UC tutorial.cl
  *
  */
 

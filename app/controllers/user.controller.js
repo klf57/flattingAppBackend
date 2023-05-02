@@ -28,7 +28,9 @@ exports.create = async function(req, res){
     const firstName = req.body[`firstName`];
     const lastName = req.body[`lastName`];
     const email = req.body[`email`];
-    const password = req.body['password'];
+    const password = req.body[`password`];
+
+
 
     //hash and salt the password being sent to database.
     let hashedPassword = await bcrypt.hash(password, saltRounds);

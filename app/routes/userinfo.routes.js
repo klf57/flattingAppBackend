@@ -19,7 +19,7 @@ const baseUrl = '/user';
 module.exports = function(app) {
 
     app.route(baseUrl + '/signUp')
-        .post(user.create);
+        .post(auth.isSignUpFormValid, user.create);
 
 
     app.route(baseUrl + '/login')
