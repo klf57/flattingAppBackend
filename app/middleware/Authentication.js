@@ -2,6 +2,7 @@
  * Contains functions that check received forms are valid.
  *  Although the frontend will also contain validity checks, adding another in the backend ensures that even if the user found a way to send an invalid form, a request will not be sent to the db.
  * Module needs to do white space checks for data input, especially for creating new user accounts to prevent db being filled with "empty" values.
+ * todo: move functions re validity of data to a new file called validitychecking.
  **/
 const user = require('../models/userinfo.model');
 
@@ -12,8 +13,10 @@ const user = require('../models/userinfo.model');
  * status codes : 501 = server error 401 = unauthorized.
  */
 exports.checkUserLoggedIn= async function(req, res, next){
+    console.log("checking if user has session token");
 
     try{
+
 
         const sessionToken = req.headers["x-authorization"]
         //if there is no x-Authorization in header.
@@ -23,13 +26,16 @@ exports.checkUserLoggedIn= async function(req, res, next){
 
         } else {
 
+
             const userId = await user.getUserByIdToken(sessionToken);
 
-            //todo test what happens if no matching token is found. Check what happens if no userId body is returned with query.
+
+
             if(userId) {
                 //add the userId to the req and move to next function in user/flatmates route.
                 //user id may be  needed when retrieving user's information for MENU screen
                 req.body["userId"] = userId;
+
                 next();
 
             } else {
@@ -41,7 +47,7 @@ exports.checkUserLoggedIn= async function(req, res, next){
 
     } catch(err){
         res.status(501)
-            .send();
+            .send(err);
     }
 
 }
@@ -58,6 +64,7 @@ exports.isLoginFormValid = async function(req, res, next){
 
     //checks if either email or password is empty. todo: check for whitespace in given info
     if( !( req.body['email'] || req.body['password']) || hasWhiteSpaces([req.body['email'], req.body['password']])  ){
+
 
         res.status(401)
             .send("email or password is empty");
@@ -109,7 +116,6 @@ exports.isSignUpFormValid =  async function(req, res, next){
                 .send("password length too short");
         } else{
 
-        //needs to trim any trailing whitespace from email.
         next(); //moves to next function called on the route.
 
     }
@@ -119,12 +125,45 @@ exports.isSignUpFormValid =  async function(req, res, next){
 
 /**
  * Makes sure any information user wants to change is a valid change. It also handles if a req.param call turns up undefined.
- * For updates, user doesn't have to input all their informatio again. Just the new data they want to change.
+ * For updates, user doesn't have to input all their information. Just the new data they want to change.
+ * Update form only needs to check cases wherein, new password or email as well as full whitespace entries.
  * @req
- * @res
- * @next
+ * @res 400 status for any invalid data detected.
+ * @next continues to user.controller updateinfo
  */
-exports.isUpdateFormValid  = async function(req, res, next){
+exports.isUpdateFormValid  = async function(req, res, next) {
+
+
+    let email = req.body["email"];
+    let password = req.body["password"];
+
+    //must check if email is valid.
+    if (email) {
+        if (!isEmailValid()) {
+            res.status(400)
+                .send("invalid email format");
+        } else {
+
+            //next();
+        }
+
+    } else if (password) {
+        if (password.length < 8 || hasWhiteSpaces(password)) {
+            res.status(400)
+                .send("new password too short or just whitespaces");
+            //next()
+        }
+    }
+
+    //need to check if the other entries were filled in with whitespaces
+    if(hasWhiteSpaces([req.body["firstName"],req.body["lastName"],req.body["phoneNumber"], req.body["home"]])){
+        res.status(400)
+            .send("cant update with only spaces");
+    } else {
+        next();
+    }
+
+
 
 };
 
@@ -136,6 +175,7 @@ exports.isUpdateFormValid  = async function(req, res, next){
  * Checks if the given email is in the correct Format. THe regular expression  should be able to detect common formats used for valid emails
  * https://www.regular-expressions.info/email.html
  * Note this function is used only as a helper for other functions in this file currently.
+ * It will also return False if it detects any trailing whitespaces at the before and after the email.
  * @param email the email received in req.body
  * @returns  True if it fits the regular expression. Strongly indicates that the given email is in a valid format.
  */
@@ -162,10 +202,14 @@ function hasWhiteSpaces(valuesToCheck){
 
     for(let i = 0; i < valuesToCheck.length; i++){
 
+        //only if it is not undefined. which happens in the case of checking update form validity.
+        if(valuesToCheck.at(i)) {
 
-        if( whiteSpaceExpression.test(valuesToCheck.at(i) )){
 
-            return true;
+            if (whiteSpaceExpression.test(valuesToCheck.at(i))) {
+
+                return true;
+            }
         }
 
     }

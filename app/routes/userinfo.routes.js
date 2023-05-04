@@ -26,10 +26,13 @@ module.exports = function(app) {
         .post(auth.isLoginFormValid, user.login);
 
     app.route(baseUrl + '/logout')
-        .post(user.logout);
+        .patch(user.logout);
 
     app.route(baseUrl + '/flatmates')
         .get(auth.checkUserLoggedIn, user.viewFlatmates);
+
+    app.route(baseUrl + '/settings')
+        .patch(auth.checkUserLoggedIn, auth.isUpdateFormValid, user.updateInfo);
 
 
 

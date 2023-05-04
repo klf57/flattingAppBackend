@@ -83,15 +83,12 @@ exports.login = async function(req, res) {
         if(bcrypt.compare(password, userDetails['password'])){
 
 
-            //jwt.sign required 4 arguments.
+            //jwt.sign required 4 arguments. otherwise it threw an error.
             const sessionToken = jwt.sign(userDetails['userid'], Process.env.SECRET, undefined, undefined );
 
             await user.loginUser(userDetails['userid'],sessionToken);
 
-
-            //just do await user.startNewSession();
-            //Have token generated here.
-            // use .json([iduser, token]
+            //returns the session code that is assigned to the logged in user.
             res.status(200)
                 .json({sessionToken});
 
@@ -149,7 +146,32 @@ exports.logout = async function(req, res){
                 .send(err);
         }
     }
+};
+
+
+
+exports.updateInfo = async function(req, res){
+
+
+    try{
+        //lots of optional information to handle.
+        let home = req.body['home'];
+
+
+        //await user.changeUserInfo([req.body["firstName"],req.body["lastName"],req.body["phoneNumber"], req.body["home"]]);
+
+
+        //res.status(200) //consider raising a 304 if no changes were done?
+          //  .send("update done");
+
+
+    }catch (error){
+        res.status(500)
+            .send(error);
+    }
 }
+
+
 
 /**
  * Handles getting information of the flatemates that the user is currently living with.

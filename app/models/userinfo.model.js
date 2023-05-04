@@ -80,7 +80,7 @@ exports.removeToken = async function(sessionToken){
     conn.release();
 
 
-    //note that the affected row should only ever be 1.
+    //note that the affected row should only ever be 1 or 0.
     return result["affectedRows"] >= 1;
 }
 
@@ -93,12 +93,29 @@ exports.removeToken = async function(sessionToken){
 exports.getUserByIdToken = async function(sessionToken){
 
     const conn = await db.getPool().getConnection();
-    const query = 'SELECT `userid` FROM `user` WHERE `session_token = ?` ';
+    const query = 'SELECT `userid` FROM `user` WHERE `session_token` = ? ';
     const result = await conn.query(query, [sessionToken]);
     conn.release();
 
 
-    return result[0["userid"]];
+    //Checks if query returned a userId or not.
+    if(result[0].length < 1 ){
+        return null;
+    } else {
+        return result[0][0]["userid"];
+
+    }
+
+
+
+};
+
+/** Needs to tailor the sql depending on the data the user has given. **/
+exports.changeUserInfo = async function(newInfo){
+
+
+    console.log("not implemented path yet");
+
 
 };
 
