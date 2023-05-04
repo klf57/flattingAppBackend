@@ -57,8 +57,7 @@ exports.checkUserLoggedIn= async function(req, res, next){
 exports.isLoginFormValid = async function(req, res, next){
 
     //checks if either email or password is empty. todo: check for whitespace in given info
-    if( !( req.body['email'] || req.body['password'])  ){
-
+    if( !( req.body['email'] || req.body['password']) || hasWhiteSpaces([req.body['email'], req.body['password']])  ){
 
         res.status(401)
             .send("email or password is empty");
@@ -134,7 +133,7 @@ exports.isUpdateFormValid  = async function(req, res, next){
 
 
 /**
- * Checks if the given email is in the correct Format. THe regular expression isn't 100% accurate but should be able to detect common formats used for valid emails
+ * Checks if the given email is in the correct Format. THe regular expression  should be able to detect common formats used for valid emails
  * https://www.regular-expressions.info/email.html
  * Note this function is used only as a helper for other functions in this file currently.
  * @param email the email received in req.body

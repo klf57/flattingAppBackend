@@ -19,7 +19,7 @@ const saltRounds = 10;
 /**
  * Handles creating a new user.
  * @param req User must provide email, name, and a password.
- * @param res a 201 status if successfully made otherswise 500 with the reason for the error.
+ * @param res a 201 status if successfully made otherswise 500 with the reason for the error. 409 if trying to enter an email already in db.
  * @returns {Promise<void>}
  */
 exports.create = async function(req, res){
@@ -38,13 +38,22 @@ exports.create = async function(req, res){
     try {
 
         await user.createNewUser(firstName, lastName, email, hashedPassword);
+
         res.status(201)
             .send("USER CREATED"); //{user_id: result.insertId}
 
         //the user_id returned to the client to use in further requests
     } catch ( err ) {
-        res.status(500)
-            .send(`ERROR creating account: ${err}`);
+
+        // checks if this is caused by user triyng to enter an email already in the system.
+        if(err.errno == 1062){
+            res.status(409)
+                .send("email already exists");
+
+        } else {
+            res.status(500)
+                .send(`ERROR creating account: ${err}`);
+        }
 
     }
 }
