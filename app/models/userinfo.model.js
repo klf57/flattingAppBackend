@@ -2,6 +2,7 @@
  * Imports the db config file and has these functions
  *in the model, queries for db go here.
  * for token generating: https://www.freecodecamp.org/news/securing-node-js-restful-apis-with-json-web-tokens-9f811a92bb52/
+ * todo option to remove self from home.
  */
 
 const db = require('../../config/db');
@@ -101,13 +102,94 @@ exports.getUserByIdToken = async function(sessionToken){
 };
 
 /** Needs to tailor the sql depending on the data the user has given. **/
-exports.changeUserInfo = async function(newInfo){
+exports.replaceUserInfo = async function(password, email, firstName, lastName, phoneNumber, home , sessionToken){
+
+    let writtenQuery = await writeUpdateQuery(password, email, firstName, lastName, phoneNumber, home , sessionToken);
+
+    await dbQuery(writtenQuery[0], writtenQuery[1]);
 
 
-    console.log("not implemented path yet");
-
+    return;
 
 };
+
+
+
+writeUpdateQuery = async function(password, email, firstName, lastName, phoneNumber, home , sessionToken){
+
+    let queryParams = [];
+    //There will always be a sessionToken
+    let query = 'UPDATE `user`';
+    //Check if theres a comma as last character
+
+    query += ' SET';
+
+    //if conditions to check if any of these variables have been defined(have a value assigned to it)
+    if(password){
+        query += await checkIfSetEnding('password = ?', query);
+        queryParams.push(password);
+
+
+    }
+    if(email){
+        query += await checkIfSetEnding('email = ?', query);
+        queryParams.push(email);
+
+
+    }
+    if(firstName){
+        query += await checkIfSetEnding('first_name = ?', query);
+        queryParams.push(firstName);
+
+    }
+    if(lastName){
+        query += await checkIfSetEnding('last_name = ?', query);
+        queryParams.push(lastName);
+
+    }
+    if(home){
+        query += await checkIfSetEnding('home = ?', query);
+        queryParams.push(home);
+    }
+    if(phoneNumber){
+        query += await checkIfSetEnding('phone_number = ?', query);
+        queryParams.push(phoneNumber);
+    }
+
+
+
+
+    query += ' WHERE session_token = ?';
+    queryParams.push(sessionToken);
+
+    return [query, queryParams];
+
+};
+
+
+/**
+ * Supporter function to check if this SET command is the first one being written or not.
+ * @param queryToAdd The query thats needs to be added.
+ * @param currentQuery the currentQuery written so far.
+ * @returns {Promise<string>}
+ */
+checkIfSetEnding= async function(queryToAdd, currentQuery){
+
+    let endsWithSet = /SET$/;
+
+    if(endsWithSet.test(currentQuery)) {
+        let modifyQuery = ' ' + queryToAdd;
+        return modifyQuery;
+    }else {
+
+        //There was a SET command already added prior
+        let modifyQuery = ', ' + queryToAdd;
+        return modifyQuery;
+    }
+
+};
+
+
 
 
 exports.getFlatmatesInfo = async function(sessionToken){

@@ -144,10 +144,14 @@ exports.isUpdateFormValid  = async function(req, res, next) {
                 .send("invalid email format");
         }
 
-    } else if (password) {
+    }
+
+    if (password) {
         if (password.length < 8 || hasWhiteSpaces(password)) {
             res.status(400)
-                .send("new password too short or just whitespaces");
+                .send("new password too short or just whitespaces")
+
+
 
         }
     }

@@ -154,17 +154,24 @@ exports.logout = async function(req, res){
 
 exports.updateInfo = async function(req, res){
 
+    console.log('requesting to replace user information');
 
     try{
         //lots of optional information to handle.
-        let home = req.body['home'];
+        //If user is replacing password.
+
+        if(req.body["password"]){
+            let newPassword = req.body["password"];
+            //replace newPassword with hashedPassword.
+            req.body["password"] = await bcrypt.hash(newPassword, saltRounds);
+        }
 
 
-        //await user.changeUserInfo([req.body["firstName"],req.body["lastName"],req.body["phoneNumber"], req.body["home"]]);
+        //send through req.body
+        await user.replaceUserInfo(req.body["password"], req.body["email"], req.body["firstName"], req.body["lastName"], req.body["phoneNumber"],req.body["home"], req.headers["x-authorization"]);
 
-
-        //res.status(200) //consider raising a 304 if no changes were done?
-          //  .send("update done");
+        res.status(200)
+            .send();//consider raising a 304 if no changes were done?.send("update done");
 
 
     }catch (error){
