@@ -142,27 +142,23 @@ exports.isUpdateFormValid  = async function(req, res, next) {
         if (!isEmailValid()) {
             res.status(400)
                 .send("invalid email format");
-        } else {
-
-            //next();
         }
 
     } else if (password) {
         if (password.length < 8 || hasWhiteSpaces(password)) {
             res.status(400)
                 .send("new password too short or just whitespaces");
-            //next()
+
         }
     }
 
-    //need to check if the other entries were filled in with whitespaces
+    //finally, need to check if the other entries were filled in with whitespaces
     if(hasWhiteSpaces([req.body["firstName"],req.body["lastName"],req.body["phoneNumber"], req.body["home"]])){
         res.status(400)
             .send("cant update with only spaces");
     } else {
         next();
     }
-
 
 
 };
