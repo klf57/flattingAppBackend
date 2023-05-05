@@ -69,7 +69,7 @@ exports.login = async function(req, res) {
 
     console.log('request to login');
 
-    //when is token generated? could be in the model
+
     //user logs in with their email.
     let password = req.body['password'];
     let email = req.body['email'];
@@ -128,6 +128,8 @@ exports.logout = async function(req, res){
 
         try {
             //Makes sure that the db did actually update a row.
+
+
             if (tokenWasRemoved) {
 
                 res.status(200)

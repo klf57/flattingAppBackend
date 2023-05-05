@@ -1,4 +1,3 @@
-
 /**
  * Imports the db config file and has these functions
  *in the model, queries for db go here.
@@ -6,6 +5,7 @@
  */
 
 const db = require('../../config/db');
+const {dbQuery} = require("./QueryHandler");
 
 
 /**
@@ -33,15 +33,13 @@ exports.createNewUser = async function (firstName, lastName, email, hashedPasswo
  */
 exports.getHashedPassword =  async function (email) {
 
-    console.log(`Request to retrieve a user via their email`);
 
-    const conn = await db.getPool().getConnection();
     const query = 'SELECT `password`, `userid` FROM user WHERE `email` = ?';
-    const [ result ] = await conn.query( query, [email]);
-    conn.release();
+    const  result  = await dbQuery( query, [email]);
 
 
-    return result[0];
+    //the needed information is nested so in order to retrieve, use these indexes.
+    return result[0][0];
 
 };
 
@@ -52,16 +50,11 @@ exports.getHashedPassword =  async function (email) {
  */
 exports.loginUser = async function(userId, sessionToken) {
 
-    console.log(`Request to start new session`);
-
-
-
-    const conn = await db.getPool().getConnection();
     const query = 'UPDATE  `user` SET `session_token` = ? WHERE `userid` = ?';
-    await conn.query(query, [sessionToken, userId]);
-    conn.release();
+    await dbQuery( query, [sessionToken, userId]);
 
-    //does not need a result from db. Just return the new Token and the provided ID.
+
+    //does not need a result from db.
     return;
 };
 
@@ -73,15 +66,15 @@ exports.loginUser = async function(userId, sessionToken) {
  * @returns {Promise<boolean>}
  */
 exports.removeToken = async function(sessionToken){
-    const conn = await db.getPool().getConnection();
-    const query = 'UPDATE `user` SET `session_token` = NULL WHERE `session_token` = ?';
-    const [result] = await conn.query(query, [sessionToken]);
 
-    conn.release();
+    const query = 'UPDATE `user` SET `session_token` = NULL WHERE `session_token` = ?';
+
+
+    let result = await dbQuery(query, [sessionToken])
 
 
     //note that the affected row should only ever be 1 or 0.
-    return result["affectedRows"] >= 1;
+    return result.at(0)["affectedRows"] >= 1;
 }
 
 
@@ -92,11 +85,9 @@ exports.removeToken = async function(sessionToken){
  */
 exports.getUserByIdToken = async function(sessionToken){
 
-    const conn = await db.getPool().getConnection();
-    const query = 'SELECT `userid` FROM `user` WHERE `session_token` = ? ';
-    const result = await conn.query(query, [sessionToken]);
-    conn.release();
 
+    const query = 'SELECT `userid` FROM `user` WHERE `session_token` = ? ';
+    const result = await dbQuery(query, [sessionToken]);
 
     //Checks if query returned a userId or not.
     if(result[0].length < 1 ){
@@ -105,7 +96,6 @@ exports.getUserByIdToken = async function(sessionToken){
         return result[0][0]["userid"];
 
     }
-
 
 
 };
@@ -122,12 +112,11 @@ exports.changeUserInfo = async function(newInfo){
 
 exports.getFlatmatesInfo = async function(sessionToken){
 
-    const conn = await db.getPool().getConnection();
     const query = 'SELECT `first_name`, `last_name`, `phone_number` FROM `user` ' +
         'INNER JOIN `houses` ON `user.home` = `houses.id`' +
         'WHERE `user.home` = (SELECT `user.home` FROM `user` AS `u1` WHERE `u1.session_token = ?)';
-    const result = await conn.query(query, [sessionToken]);
-    conn.release();
+
+    const result = await dbQuery(query, [sessionToken]);
 
     return result;
 

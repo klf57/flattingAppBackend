@@ -5,17 +5,19 @@
 
 const db = require('../../config/db');
 
-exports.handleDbQuery = async function(query, valuesList){
+exports.dbQuery = async function(query, valuesList){
 
     const conn = await db.getPool().getConnection();
 
-    const result = await conn.query( query );
 
-    if(! (valuesList.isEmpty() )){
-        const [ result ] = await conn.query( query, valuesList);
+    let result;
+    //Different structure depending on if the query needs values.
+    if( valuesList.length >= 1 ){
+
+        result  = await conn.query( query, valuesList);
 
     } else{
-        const [ result ] = await conn.query( query);
+        result  = await conn.query(query);
     }
     conn.release();
 
