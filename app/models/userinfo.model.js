@@ -190,6 +190,12 @@ checkIfSetEnding= async function(queryToAdd, currentQuery){
 };
 
 
+exports.removeHome = async function(sessionToken){
+
+    await dbQuery('UPDATE `user` SET `home` = NULL  WHERE `session_token` = ?',[sessionToken]);
+    //doesnt return anything
+};
+
 
 
 exports.getFlatmatesInfo = async function(sessionToken){

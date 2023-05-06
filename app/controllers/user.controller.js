@@ -166,9 +166,18 @@ exports.updateInfo = async function(req, res){
             req.body["password"] = await bcrypt.hash(newPassword, saltRounds);
         }
 
+        //check if user wants to leave current house. using -1 as no home id will be that value.
+        if(req.body["home"] == -1 ){
 
-        //send through req.body
-        await user.replaceUserInfo(req.body["password"], req.body["email"], req.body["firstName"], req.body["lastName"], req.body["phoneNumber"],req.body["home"], req.headers["x-authorization"]);
+            await user.removeHome(req.headers["x-authorization"]);
+
+        } else {
+
+            //user is updating info
+            await user.replaceUserInfo(req.body["password"], req.body["email"], req.body["firstName"], req.body["lastName"], req.body["phoneNumber"],req.body["home"], req.headers["x-authorization"]);
+
+
+        }
 
         res.status(200)
             .send();//consider raising a 304 if no changes were done?.send("update done");
