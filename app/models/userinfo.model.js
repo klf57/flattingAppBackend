@@ -200,9 +200,10 @@ exports.removeHome = async function(sessionToken){
 
 exports.getFlatmatesInfo = async function(sessionToken){
 
-    const query = 'SELECT `first_name`, `last_name`, `phone_number` FROM `user` ' +
-        'INNER JOIN `houses` ON `user.home` = `houses.id`' +
-        'WHERE `user.home` = (SELECT `user.home` FROM `user` AS `u1` WHERE `u1.session_token = ?)';
+
+    const query = 'SELECT first_name, last_name, phone_number FROM `user` ' +
+        'INNER JOIN `houses` ON user.home = houses.houseid ' +
+        'WHERE `home` = (SELECT ucopy.home FROM `user` AS ucopy WHERE `session_token` = ?)';
 
     const result = await dbQuery(query, [sessionToken]);
 

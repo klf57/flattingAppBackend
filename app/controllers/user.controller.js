@@ -205,11 +205,11 @@ exports.viewFlatmates = async function(req, res){
         const flatMatesList = await user.getFlatmatesInfo(req.headers["x-authorization"]);
 
         res.status(200)
-            .json(flatMatesList);
+            .json(flatMatesList[0]);
 
 
     } catch(err){
-        res.status(401)
+        res.status(500)
             .send(err);
     }
 
