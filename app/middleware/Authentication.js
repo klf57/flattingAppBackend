@@ -5,6 +5,8 @@
  * todo: move functions re validity of data to a new file called validitychecking.
  **/
 const user = require('../models/userinfo.model');
+const {getUserByIdToken} = require("../models/userinfo.model");
+const validityChecker = require("../models/ValidityChecks");
 
 
 
@@ -53,6 +55,42 @@ exports.checkUserLoggedIn= async function(req, res, next){
 }
 
 /**
+ * Checks that the userId param matches the userId the token is assigned to.
+ * @param req
+ * @param res
+ * @param next
+ * @returns {Promise<void>}
+ */
+exports.checkTokenAndIdMatch = async function(req, res, next){
+
+    try{
+
+        if(!(await validityChecker.tokenInDatabase(req.body['sessionToken']))){
+            res.status(401)
+                .send('unauthorised to make bills');
+        }
+
+
+        const  userId = req.params['userId'];
+        const matchedId = await getUserByIdToken(req.body['sessionToken']);
+
+        //if the users page they are on matches their session token, continue.
+        if(matchedId.length != userId){
+            res.status(401)
+                .send('unauthorised to make changes');
+        }
+
+        next();
+
+
+    }catch(err){
+        res.status(501)
+            .send(err);
+    }
+
+}
+
+/**
  * Check that the login information is not empty / invalid. Return 401 unauthorised if it does not pass checks. or 400 if invalid data given.
  * This is so that backend does not try to send an Undefined property to the database causing  status code 500 to be returned.
  * @param req
@@ -69,9 +107,14 @@ exports.isLoginFormValid = async function(req, res, next){
         res.status(401)
             .send("email or password is empty");
 
+    } else if(await validityChecker.emailInDatabase(req.body['email'])) {
+
+        res.status(401)
+            .send('email not in db');
     } else {
         next();
     }
+
 
 };
 

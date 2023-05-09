@@ -6,8 +6,37 @@
 
 const bill = require('../models/bill.model');
 
+
+/**
+ * Handles recording the new bills and assigning them to the chosen flatemates so they will be notified.
+ * @param req
+ * @param res 400 status code if invalid res.body data.
+ * @returns {Promise<void>}
+ */
+exports.addBills = async function(req, res){
+    try{
+
+        let recipientsList = req.body["recipients"];
+
+        if(!(recipientsList)){
+            res.status(400)
+                .send();
+        }
+
+        //send the Recipients list through!
+
+
+
+
+    }catch(err){
+        res.status(500)
+            .send(err);
+    }
+
+}
+
 exports.viewBills = async function(req, res){
-    var userId = req.params.userId;
+    let userId = req.params.userId;
 
     try{
         const result = await bill.getHouseBills(userId);
