@@ -3,9 +3,13 @@
  * @type {{connect?: function(): Promise<void>, getPool?: function(): null}}
  */
 const db = require('../../config/db');
+const moment = require('moment');
 
 
-
+/**
+ * Inserts the new bill, assigning them to the selected flatmates.
+ * @returns {Promise<void>}
+ */
 exports.recordBill = async function(){
 
 
@@ -13,7 +17,16 @@ exports.recordBill = async function(){
     let query = 'START TRANSACTION ';
     query += 'INSERT INTO flatting.bills';
 
+    console.log("not implemented bills yet");
+
     //billId, roommate, home, original_amount, amount_due, bill_type
+    //date added is done by the code it will record the current date.
+    let date = moment();
+    let currentDate = date.format('D/MM/YYYY');
+    console.log(currentDate);
+
+    res.status(500)
+        .send("went to recordBill");
 
 };
 

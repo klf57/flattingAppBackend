@@ -16,16 +16,12 @@ const bill = require('../models/bill.model');
 exports.addBills = async function(req, res){
     try{
 
-        let recipientsList = req.body["recipients"];
+        let recipientsList = req.body["recipientsList"];
 
-        if(!(recipientsList)){
-            res.status(400)
-                .send();
-        }
+        //The bill needs to be evenly divided between the selected flatMates
+        throw new Error('not finished implementing');
 
         //send the Recipients list through!
-
-
 
 
     }catch(err){

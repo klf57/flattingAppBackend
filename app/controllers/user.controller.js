@@ -83,7 +83,7 @@ exports.login = async function(req, res) {
         if(bcrypt.compare(password, userDetails['password'])){
 
 
-            //jwt.sign required 4 arguments. otherwise it threw an error.
+            //jwt.sign required 4 arguments. otherwise it threw an error. value of secret is stored in env file.
             const sessionToken = jwt.sign(userDetails['userid'], Process.env.SECRET, undefined, undefined );
 
             await user.loginUser(userDetails['userid'],sessionToken);

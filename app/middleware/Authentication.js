@@ -65,17 +65,20 @@ exports.checkTokenAndIdMatch = async function(req, res, next){
 
     try{
 
-        if(!(await validityChecker.tokenInDatabase(req.body['sessionToken']))){
+        let isInDb = await validityChecker.tokenInDatabase(req.headers["x-authorization"]);
+
+        if(!(isInDb)){
             res.status(401)
-                .send('unauthorised to make bills');
+                .send('token not found');
         }
 
 
         const  userId = req.params['userId'];
-        const matchedId = await getUserByIdToken(req.body['sessionToken']);
+        const matchedId = await getUserByIdToken(req.headers['x-authorization']);
 
         //if the users page they are on matches their session token, continue.
-        if(matchedId.length != userId){
+
+        if(matchedId != userId){
             res.status(401)
                 .send('unauthorised to make changes');
         }
