@@ -45,11 +45,13 @@ exports.addBills = async function(req, res){
 
 exports.viewBills = async function(req, res){
     let userId = req.params.userId;
+    let viewAll = req.query['viewAll'];
 
     try{
-        const result = await bill.getHouseBills(userId);
+
+        const result = await bill.getHouseBills(userId, viewAll);
         res.status(200)
-            .send(result);
+            .send(result[0]); //only sends back the list of json objects
 
     }catch(error){
         res.status(500)

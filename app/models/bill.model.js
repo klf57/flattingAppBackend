@@ -29,22 +29,31 @@ exports.recordBill = async function(recipientsList){
 };
 
 /**
- * Gets all the bills for the household.
+ * Gets either all the households bills to provide an overview or just the user's bills.
  * @param userId
  * @returns {Promise<*>}
  */
-exports.getHouseBills = async function(userId){
+exports.getHouseBills = async function(userId, viewAll){
 
     console.log(`Request to get the house's bills from the database`);
 
-    const conn = await db.getPool().getConnection();
 
-    // USES JOIN TO MAKE ONE QUERY.
-    const query = 'select * from personal_bill where houseid = (select home from user where userid = ?)';
+    let query = '';
 
-    //houseId value will replace the questionmark from the query above.
-    const [result] = await conn.query(query,[userId]);
-    conn.release;
+
+
+    // either uses a query to get all house's bills or retrieves just the user's bills.
+    if(viewAll){
+        query = 'select * from bills where `home` = (select home from user where userid = ?)';
+
+
+    } else {
+        query = 'select * from bills where `roommate` = ?';
+    }
+
+    const result = await dbQuery(query, userId);
+
+
     return result;
 
 
