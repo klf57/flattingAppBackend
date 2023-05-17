@@ -151,7 +151,12 @@ exports.logout = async function(req, res){
 };
 
 
-
+/**
+ * Sends information that user wants to update their account with.
+ * @param req
+ * @param res
+ * @returns {Promise<void>}
+ */
 exports.updateInfo = async function(req, res){
 
     console.log('requesting to replace user information');
@@ -192,7 +197,7 @@ exports.updateInfo = async function(req, res){
 
 
 /**
- * Handles getting information of the flatemates that the user is currently living with.
+ * Sends request for information of the flatmates that the user is currently living with.
  */
 exports.viewFlatmates = async function(req, res){
 

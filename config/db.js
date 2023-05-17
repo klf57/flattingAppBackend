@@ -20,7 +20,15 @@ exports.connect = async function () {
 
 };
 
+/** from a youtube tutorial
+module.exports = mysql.createConnection({
 
+    host:process.env.HOST,
+    user: process.env.USER,
+    password: process.env.PASSWORD,
+    database: process.env.DATABASE,
+});
+**/
 exports.getPool = function(){
     return state.pool;
 };

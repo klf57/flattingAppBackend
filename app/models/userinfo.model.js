@@ -2,7 +2,6 @@
  * Imports the db config file and has these functions
  *in the model, queries for db go here.
  * for token generating: https://www.freecodecamp.org/news/securing-node-js-restful-apis-with-json-web-tokens-9f811a92bb52/
- * todo option to remove self from home.
  */
 
 const db = require('../../config/db');
@@ -114,7 +113,17 @@ exports.replaceUserInfo = async function(password, email, firstName, lastName, p
 };
 
 
-
+/**
+ * Prepares SQL query to update User's information. Ensures only variables given a value are added to the query.
+ * @param password
+ * @param email
+ * @param firstName
+ * @param lastName
+ * @param phoneNumber
+ * @param home
+ * @param sessionToken
+ * @returns {Promise<(string|*[])[]>}
+ */
 writeUpdateQuery = async function(password, email, firstName, lastName, phoneNumber, home , sessionToken){
 
     let queryParams = [];
@@ -190,6 +199,11 @@ checkIfSetEnding= async function(queryToAdd, currentQuery){
 };
 
 
+/**
+ *Tells db to remove current house id from user's account.
+ * @param sessionToken
+ * @returns {Promise<void>}
+ */
 exports.removeHome = async function(sessionToken){
 
     await dbQuery('UPDATE `user` SET `home` = NULL  WHERE `session_token` = ?',[sessionToken]);
@@ -201,7 +215,7 @@ exports.removeHome = async function(sessionToken){
 exports.getFlatmatesInfo = async function(sessionToken){
 
 
-    const query = 'SELECT first_name, last_name, phone_number FROM `user` ' +
+    const query = 'SELECT first_name, last_name, phone_number, userid FROM `user` ' +
         'INNER JOIN `houses` ON user.home = houses.houseid ' +
         'WHERE `home` = (SELECT ucopy.home FROM `user` AS ucopy WHERE `session_token` = ?)';
 

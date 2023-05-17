@@ -3,36 +3,39 @@
  * @type {{connect?: function(): Promise<void>, getPool?: function(): null}}
  */
 const db = require('../../config/db');
+const {dbQuery} = require("./QueryHandler");
 const moment = require('moment');
-
+const dynamicQuery = require('../models/DynamicQuery');
 
 /**
  * Inserts the new bill, assigning them to the selected flatmates.
  * @returns {Promise<void>}
  */
-exports.recordBill = async function(){
+exports.recordBill = async function(recipientsList){
 
 
-    //dynamic transaction sql to declare multiple queries.
-    let query = 'START TRANSACTION ';
-    query += 'INSERT INTO flatting.bills';
-
-    console.log("not implemented bills yet");
-
-    //billId, roommate, home, original_amount, amount_due, bill_type
-    //date added is done by the code it will record the current date.
+    //current date is retrieved and saved in database so users know when the bill was added.
     let date = moment();
-    let currentDate = date.format('D/MM/YYYY');
-    console.log(currentDate);
+    let currentDate = date.format('YYYY-MM-D');
 
-    res.status(500)
-        .send("went to recordBill");
+
+    //records to the db but first writes the query.
+    let queryTemp = dynamicQuery.writeBills(recipientsList, currentDate);
+
+    let result = await dbQuery(queryTemp[0], queryTemp[1]);
+
+    return;
 
 };
 
+/**
+ * Gets all the bills for the household.
+ * @param userId
+ * @returns {Promise<*>}
+ */
 exports.getHouseBills = async function(userId){
 
-    console.log(`Request to get all bills from the database`);
+    console.log(`Request to get the house's bills from the database`);
 
     const conn = await db.getPool().getConnection();
 
@@ -46,3 +49,4 @@ exports.getHouseBills = async function(userId){
 
 
 }
+

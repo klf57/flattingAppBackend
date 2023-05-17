@@ -26,7 +26,7 @@ exports.isLivingWithUser = async function(req, res, next){
         try {
 
             //sends one query to check recipient's housing status
-
+            //nested query used to retrieve the active user's houseid to compare in the conditional IF check.
             let query = 'SELECT IF( ' +
                 '(SELECT s.home '+
                 'FROM flatting.user AS s ' +
@@ -47,7 +47,7 @@ exports.isLivingWithUser = async function(req, res, next){
             let result =  await dbQuery(query, queryParams);
 
 
-            //a userid not found in db was provided if the list returned is shorter than the idList sent to the query.
+            //if the list returned is shorter than the idList sent to the query, then a given user id was not located.
             if(roommateIds.length != result[0].length ) {
 
                 res.status(400)
@@ -55,7 +55,7 @@ exports.isLivingWithUser = async function(req, res, next){
 
             }
 
-            //checks if the recipients dont Live with the user.
+            //checks if any user returned with False re 'if they are living with user'
             if(result[0].some(item => item.isLivingWith == 0)){
 
                 res.status(400)

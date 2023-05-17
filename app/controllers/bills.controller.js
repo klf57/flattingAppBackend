@@ -7,6 +7,7 @@
 const bill = require('../models/bill.model');
 
 
+
 /**
  * Handles recording the new bills and assigning them to the chosen flatemates so they will be notified.
  * @param req
@@ -19,14 +20,25 @@ exports.addBills = async function(req, res){
         let recipientsList = req.body["recipientsList"];
 
         //The bill needs to be evenly divided between the selected flatMates
-        throw new Error('not finished implementing');
+        await bill.recordBill(recipientsList);
 
-        //send the Recipients list through!
+        res.status(201)
+            .send();
 
 
     }catch(err){
-        res.status(500)
-            .send(err);
+
+        //checks if db trigger detected a duplicate bill entry.
+        if(err[`sqlState`] == "45000"){
+            res.status(404)
+                .send(err['sqlMessage']);
+        } else {
+
+            res.status(500)
+                .send(err);
+
+        }
+
     }
 
 }
