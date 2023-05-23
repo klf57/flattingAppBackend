@@ -9,7 +9,7 @@
 
 exports.writeBills =  function(recipients, dateAdded){
 
-    console.log('creating query to add bills');
+    console.log('creating query for adding bills');
     //dynamic transaction sql to declare multiple queries.
     let query = 'INSERT INTO `bills`(roommate, home, original_amount, amount_due, bill_type, date_added, due_date) ' +
         'VALUES ';
@@ -45,3 +45,44 @@ exports.writeBills =  function(recipients, dateAdded){
 
     return  [query, queryParams];
 }
+
+
+/**
+ * Fills in query and query params for adding Chores.
+ * @param recipients
+ * @param dateAdded
+ * @returns {[string,*[]]}
+ */
+exports.writeChores = function(recipients, dateAdded){
+    console.log('creating query for adding chores');
+
+    let query = 'INSERT INTO `chores`(title, description, date_added, assigned_to) ' +
+        'VALUES ';
+    let queryParams = [];
+
+    //Begin to add the recipients to the query.
+    for(let i = 0; i < recipients.length ; i++){
+
+        //If this is the last recipient, no ',' is needed in string. Otherwise sql throws an error.
+        if(i == recipients.length-1){
+
+            query += '(?,?,?,?)';
+        }else {
+            query += '(?,?,?,?), ';
+
+        }
+
+
+        //add to the queryParams the values for the current recipient being written
+        queryParams.push(recipients[i]["title"]);
+        queryParams.push( recipients[i]["description"]);
+        queryParams.push(dateAdded);
+        queryParams.push(recipients[i]["roommate"]);
+
+    }
+
+    query += ';';
+
+    return [query,queryParams];
+
+};

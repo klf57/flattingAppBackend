@@ -24,9 +24,10 @@ module.exports = function() {
         next();
     });
 
-    //imports all the routes that will be used, passing the app object too.
+    //ROUTES THAT WILL BE USED BY USER
     require('../app/routes/userinfo.routes')(app);
     require('../app/routes/bills.routes')(app);
+    require('../app/routes/chores.routes')(app);
 
 
 
