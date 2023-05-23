@@ -1,5 +1,5 @@
 /**
- * Remember that controllers exist to get the requested information from the models and return it to the user in the browser.
+ * Gets the requested information from the models and return it to the user in the browser.
  * Prompts the bill.model to retrieve information relating to the user's flat's bills.
  * It can also request for bills to be created or deleted.
  */

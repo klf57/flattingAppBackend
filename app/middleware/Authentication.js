@@ -2,6 +2,7 @@
  * Contains functions that check received forms are valid.
  *  Although the frontend will also contain validity checks, adding another in the backend ensures that even if the user found a way to send an invalid form, a request will not be sent to the db.
  * Module needs to do white space checks for data input, especially for creating new user accounts to prevent db being filled with "empty" values.
+ *
  * todo: move functions re validity of data to a new file called validitychecking.
  **/
 const user = require('../models/userinfo.model');
