@@ -54,3 +54,20 @@ exports.addChores = async function(recipientsList){
 
     return;
 }
+
+/**
+ * ChoreId can only be listed as complete if the person who is assigned to it is the user wanting to update it as complete.
+ * @param choreId
+ * @param userToken
+ * @returns
+ *
+ */
+exports.ChoreIsComplete = async function(choreId, userId){
+
+    let query = 'UPDATE chores SET is_done = 1 WHERE choreid = ? AND assigned_to = ?';
+
+    await dbQuery(query, [choreId, userId]);
+
+    return; //doesn't need to return anything
+
+}

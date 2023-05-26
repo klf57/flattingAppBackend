@@ -92,4 +92,5 @@ getRoommateIds = function(recipientList){
     }
 
     return idList;
+
 }

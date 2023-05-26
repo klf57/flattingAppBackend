@@ -59,4 +59,27 @@ exports.makeChores = async function(req, res){
         res.send(error);
 
     }
+};
+
+
+/**
+ * Function that will give response 201 if the update was successful and user passed initial token validity checks.
+ * @param req
+ * @param res
+ * @returns {Promise<void>}
+ */
+exports.changeChoreStatus = async function(req, res){
+    try{
+
+        await reqChores.ChoreIsComplete(req.body["choreId"], req.body["userId"]);
+
+        res.status(201)
+            .send();
+
+    }   catch(error){
+
+        res.status(500)
+            .send(error);
+    }
+
 }
